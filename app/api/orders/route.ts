@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+
   if (
     !process.env.SPIRE_API_URL ||
     !process.env.SPIRE_API_TEST_URL ||
@@ -12,11 +13,16 @@ export async function GET() {
     );
   }
 
-  const encodedCredentials = btoa(`${process.env.SPIRE_API_USER}:${process.env.SPIRE_API_PASSWORD}`);
+  const territoryCode = request.nextUrl.searchParams.get("territoryCode");
+
+  const encodedCredentials = btoa(
+    `${process.env.SPIRE_API_USER}:${process.env.SPIRE_API_PASSWORD}`
+  );
 
   const queryParams = new URLSearchParams({
+    limit: '100',
     sort: "-orderDate",
-    filter: '{"territoryCode":"WS","udf.source":"INTERNET"}',
+    filter: `{"territoryCode":"${territoryCode}","udf.source":"INTERNET"}`,
     udf: "1",
   });
 
@@ -29,6 +35,11 @@ export async function GET() {
       Accept: "application/json",
     },
   });
+
+  if (!res.ok) {
+    console.error("Error fetching orders:", res.statusText);
+    return NextResponse.json({ error: "Failed to fetch orders from Spire" }, { status: res.status });
+  }
 
   const data = await res.json();
 
