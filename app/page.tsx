@@ -58,12 +58,12 @@ export default function Home() {
   }, [paginatedOrders]);
 
   const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "pending":
+    switch (status) {
+      case "L":
         return "bg-yellow-100";
-      case "complete":
+      case "P":
         return "bg-green-100";
-      case "cancelled":
+      case "S":
         return "bg-red-100";
       default:
         return "bg-white";
@@ -92,19 +92,26 @@ export default function Home() {
   };
 
   return (
-    <main className="w-screen h-screen flex flex-col bg-gray-100 p-4 relative">
-      <header className="flex items-center justify-between pb-4">
-        <h1 className="text-3xl font-bold">📦 Online Orders Dashboard</h1>
-        <Button onClick={() => setModalOpen(true)} title="Settings">
+    <main className="w-screen h-screen flex flex-col bg-gray-100 p-4 gap-4 relative">
+      <header className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">
+          Online Orders for {territory}
+        </h1>
+        <Button 
+          onClick={() => setModalOpen(true)} 
+          title="Settings"
+          variant={"secondary"}
+          className=" cursor-pointer"
+        >
           <Settings2 className="w-5 h-5" />
         </Button>
         <LocationModal open={modalOpen} onOpenChange={setModalOpen} />
       </header>
 
-      <section className="grow overflow-hidden rounded-md border bg-white shadow">
-        <Table className="w-full h-full text-2xl">
+      <section className="grow">
+        <Table className="h-full w-full text-2xl rounded-md border shadow table-auto">
           <TableHeader>
-            <TableRow className="bg-gray-100">
+            <TableRow className="bg-white">
               <TableHead>Order #</TableHead>
               <TableHead>Customer</TableHead>
               <TableHead>Company</TableHead>
@@ -121,7 +128,6 @@ export default function Home() {
                   getStatusColor(order.status),
                   isNewOrder(order.created) ? "animate-pulse" : ""
                 )}
-                style={{ top: `${index * 10}%`, height: '10%'}}
               >
                 {/* Order Number */}
                 <TableCell>{order.orderNo}</TableCell>
@@ -137,6 +143,25 @@ export default function Home() {
           </TableBody>
         </Table>
       </section>
+      <footer className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          {paginatedOrders.map((_, index) => (
+            <Button
+              key={index}
+              onClick={() => setCurrentPage(index)}
+              className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center",
+                currentPage === index ? "bg-blue-500 text-white" : "bg-gray-200"
+              )}
+            >
+              {index + 1}
+            </Button>
+          ))}
+        </div>
+        <p className="text-lg text-gray-500">
+          Last updated: {lastFetchedAt.current.toLocaleString()}
+        </p>
+      </footer>
     </main>
   );
 }
