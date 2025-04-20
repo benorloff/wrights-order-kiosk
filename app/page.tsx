@@ -60,11 +60,11 @@ export default function Home() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "L":
-        return "bg-yellow-100";
-      case "P":
-        return "bg-green-100";
-      case "S":
-        return "bg-red-100";
+        return "bg-green-400";
+      // case "P":
+      //   return "bg-green-100";
+      // case "S":
+      //   return "bg-red-100";
       default:
         return "bg-white";
     }
