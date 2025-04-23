@@ -26,6 +26,10 @@ export default function Home() {
 
   const ordersPerPage = 10;
 
+  /**
+   * Fetches orders from the API based on the current territory.
+   * Updates the `orders` state and resets the `currentPage` to 0.
+   */
   const fetchOrders = async () => {
     const territory = useSettingsStore.getState().territory;
     const res = await fetch(`/api/orders?territoryCode=${territory}`);
@@ -35,6 +39,9 @@ export default function Home() {
     setCurrentPage(0);
   };
 
+  /**
+   * Computes the paginated orders based on the `orders` array and `ordersPerPage`.
+   */
   const paginatedOrders = useMemo(() => {
     const pages = [];
     for (let i = 0; i < orders.length; i += ordersPerPage) {
@@ -43,12 +50,19 @@ export default function Home() {
     return pages;
   }, [orders]);
 
+  /**
+   * Effect to fetch orders when the component mounts or when the `territory` changes.
+   * Sets up an interval to automatically refresh orders every 5 minutes.
+   */
   useEffect(() => {
     fetchOrders();
     const interval = setInterval(fetchOrders, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [territory]);
 
+    /**
+   * Effect to handle automatic cycling through pages if there are multiple pages of orders.
+   */
   useEffect(() => {
     if (paginatedOrders.length <= 1) return;
     const cycle = setInterval(() => {
@@ -101,7 +115,7 @@ export default function Home() {
           onClick={() => setModalOpen(true)} 
           title="Settings"
           variant={"secondary"}
-          className=" cursor-pointer"
+          className="cursor-pointer"
         >
           <Settings2 className="w-5 h-5" />
         </Button>
@@ -129,7 +143,6 @@ export default function Home() {
                   isNewOrder(order.created) ? "animate-pulse" : ""
                 )}
               >
-                {/* Order Number */}
                 <TableCell>{order.orderNo}</TableCell>
                 <TableCell>{order.customer.name}</TableCell>
                 <TableCell>{order.customer.customerNo}</TableCell>
@@ -140,9 +153,38 @@ export default function Home() {
                 <TableCell>{orderStatus(order.status)}</TableCell>
               </TableRow>
             ))}
+            {/* { paginatedOrders[currentPage].length < 10
+              ? Array.from({length: 10 - paginatedOrders[currentPage].length}).map((__,index) =>  */}
+             { 6 < 10 
+              ? Array.from({length: 6}).map((__,index) => 
+                <TableRow key={index}>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              )
+              : ''
+            } 
           </TableBody>
         </Table>
       </section>
+      {/* <section className="grow">
+        <div
+          className="grid grid-cols-6 grid-rows-11 h-full w-full"
+        >
+          <div className="row-span-1 col-span-6">
+            <div className="grid-cols-subgrid">Order #</div>
+            <div className="grid-cols-subgrid">Customer Name</div>
+            <div className="grid-cols-subgrid">Company Name</div>
+            <div className="grid-cols-subgrid">Order Date</div>
+            <div className="grid-cols-subgrid">Total</div>
+            <div className="grid-cols-subgrid">Status</div>
+          </div>
+        </div>
+      </section> */}
       <footer className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {paginatedOrders.map((_, index) => (
