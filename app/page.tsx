@@ -60,7 +60,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [territory]);
 
-    /**
+  /**
    * Effect to handle automatic cycling through pages if there are multiple pages of orders.
    */
   useEffect(() => {
@@ -108,11 +108,9 @@ export default function Home() {
   return (
     <main className="w-screen h-screen flex flex-col bg-gray-100 p-4 gap-4 relative">
       <header className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">
-          Online Orders for {territory}
-        </h1>
-        <Button 
-          onClick={() => setModalOpen(true)} 
+        <h1 className="text-3xl font-bold">Online Orders for {territory}</h1>
+        <Button
+          onClick={() => setModalOpen(true)}
           title="Settings"
           variant={"secondary"}
           className="cursor-pointer"
@@ -135,7 +133,7 @@ export default function Home() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedOrders[currentPage]?.map((order, index) => (
+            {paginatedOrders[currentPage]?.map((order) => (
               <TableRow
                 key={order.id}
                 className={cn(
@@ -153,20 +151,21 @@ export default function Home() {
                 <TableCell>{orderStatus(order.status)}</TableCell>
               </TableRow>
             ))}
-            { paginatedOrders[currentPage]?.length < 10
-              ? Array.from({length: 10 - paginatedOrders[currentPage]?.length}).map((__,index) => 
-                <TableRow key={index}>
-                  {/* Placeholder row(s) to maintain equal row heights */}
-                  <TableCell className="text-transparent">-</TableCell>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
-                  <TableCell></TableCell>
-                </TableRow>
-              )
-              : ''
-            }
+            {paginatedOrders[currentPage]?.length < 10
+              ? Array.from({
+                  length: 10 - paginatedOrders[currentPage]?.length,
+                }).map((__, index) => (
+                  <TableRow key={index}>
+                    {/* Placeholder row(s) to maintain equal row heights */}
+                    <TableCell className="text-transparent">-</TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                ))
+              : ""}
           </TableBody>
         </Table>
       </section>
@@ -178,7 +177,7 @@ export default function Home() {
               onClick={() => setCurrentPage(index)}
               className={cn(
                 "w-8 h-8 rounded-full flex items-center justify-center",
-                currentPage === index ? "bg-blue-500 text-white" : "bg-gray-200"
+                currentPage === index ? "bg-black text-white" : "bg-gray-400"
               )}
             >
               {index + 1}
