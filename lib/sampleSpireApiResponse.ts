@@ -121,7 +121,7 @@ export const sampleSpireApiResponse: SalesOrderResponse = {
   records: [
     sampleOrder,
     // Clone and modify the above record 9 more times
-    ...Array.from({ length: 3 }).map((_, i) => {
+    ...Array.from({ length: 37 }).map((_, i) => {
       const id = 1002 + i;
       return {
         ...JSON.parse(JSON.stringify(sampleOrder)),

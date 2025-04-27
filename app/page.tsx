@@ -153,12 +153,11 @@ export default function Home() {
                 <TableCell>{orderStatus(order.status)}</TableCell>
               </TableRow>
             ))}
-            {/* { paginatedOrders[currentPage].length < 10
-              ? Array.from({length: 10 - paginatedOrders[currentPage].length}).map((__,index) =>  */}
-             { 6 < 10 
-              ? Array.from({length: 6}).map((__,index) => 
+            { paginatedOrders[currentPage]?.length < 10
+              ? Array.from({length: 10 - paginatedOrders[currentPage]?.length}).map((__,index) => 
                 <TableRow key={index}>
-                  <TableCell></TableCell>
+                  {/* Placeholder row(s) to maintain equal row heights */}
+                  <TableCell className="text-transparent">-</TableCell>
                   <TableCell></TableCell>
                   <TableCell></TableCell>
                   <TableCell></TableCell>
@@ -167,24 +166,10 @@ export default function Home() {
                 </TableRow>
               )
               : ''
-            } 
+            }
           </TableBody>
         </Table>
       </section>
-      {/* <section className="grow">
-        <div
-          className="grid grid-cols-6 grid-rows-11 h-full w-full"
-        >
-          <div className="row-span-1 col-span-6">
-            <div className="grid-cols-subgrid">Order #</div>
-            <div className="grid-cols-subgrid">Customer Name</div>
-            <div className="grid-cols-subgrid">Company Name</div>
-            <div className="grid-cols-subgrid">Order Date</div>
-            <div className="grid-cols-subgrid">Total</div>
-            <div className="grid-cols-subgrid">Status</div>
-          </div>
-        </div>
-      </section> */}
       <footer className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {paginatedOrders.map((_, index) => (
