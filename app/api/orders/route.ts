@@ -47,6 +47,7 @@ export async function GET(request: NextRequest) {
   // console.log(data);
 
   // return NextResponse.json(data);
+  console.log("Request received: ", request);
 
   const data = sampleSpireApiResponse;
   return NextResponse.json(data, { status: 200 });
