@@ -12,15 +12,26 @@ interface PasswordProtectionProps {
 export function PasswordProtection({ onAuthenticated }: PasswordProtectionProps) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const isValid = await checkPassword(password);
-    if (isValid) {
-      onAuthenticated();
-    } else {
+    setIsLoading(true);
+    setError(false);
+    
+    try {
+      const isValid = await checkPassword(password);
+      if (isValid) {
+        onAuthenticated();
+      } else {
+        setError(true);
+        setPassword("");
+      }
+    } catch (error) {
       setError(true);
       setPassword("");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -46,6 +57,7 @@ export function PasswordProtection({ onAuthenticated }: PasswordProtectionProps)
               }}
               placeholder="Enter password"
               className={error ? "border-red-500" : ""}
+              disabled={isLoading}
             />
             {error && (
               <p className="mt-2 text-sm text-red-500">
@@ -53,8 +65,8 @@ export function PasswordProtection({ onAuthenticated }: PasswordProtectionProps)
               </p>
             )}
           </div>
-          <Button type="submit" className="w-full">
-            Continue
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Checking..." : "Continue"}
           </Button>
         </form>
       </div>
