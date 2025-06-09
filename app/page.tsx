@@ -12,6 +12,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useSettingsStore } from "@/lib/store";
 import { LocationModal } from "@/components/LocationModal";
 import { Settings2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 import { Order } from "@/types/spire";
 import { cn } from "@/lib/utils";
@@ -21,10 +22,19 @@ export default function Home() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
-  const { territory } = useSettingsStore();
+  const { territory, setTerritory } = useSettingsStore();
   const lastFetchedAt = useRef<Date>(new Date());
+  const searchParams = useSearchParams();
 
   const ordersPerPage = 10;
+
+  // Effect to handle territory code from URL
+  useEffect(() => {
+    const territoryCode = searchParams.get('territoryCode');
+    if (territoryCode) {
+      setTerritory(territoryCode);
+    }
+  }, [searchParams, setTerritory]);
 
   /**
    * Fetches orders from the API based on the current territory.
