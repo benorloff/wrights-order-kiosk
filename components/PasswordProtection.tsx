@@ -11,7 +11,7 @@ interface PasswordProtectionProps {
 
 export function PasswordProtection({ onAuthenticated }: PasswordProtectionProps) {
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,7 +19,7 @@ export function PasswordProtection({ onAuthenticated }: PasswordProtectionProps)
     if (isValid) {
       onAuthenticated();
     } else {
-      setError(true);
+      setIsError(true);
       setPassword("");
     }
   };
@@ -41,13 +41,13 @@ export function PasswordProtection({ onAuthenticated }: PasswordProtectionProps)
               type="password"
               value={password}
               onChange={(e) => {
-                setError(false);
+                setIsError(false);
                 setPassword(e.target.value);
               }}
               placeholder="Enter password"
-              className={error ? "border-red-500" : ""}
+              className={isError ? "border-red-500" : ""}
             />
-            {error && (
+            {isError && (
               <p className="mt-2 text-sm text-red-500">
                 Incorrect password. Please try again.
               </p>
