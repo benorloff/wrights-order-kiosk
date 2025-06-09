@@ -47,8 +47,4 @@ export async function GET(request: NextRequest) {
   console.log(data);
 
   return NextResponse.json(data);
-  // console.log("Request received for territory: ", request.nextUrl.searchParams.get("territoryCode"));
-
-  // const data = sampleSpireApiResponse;
-  // return NextResponse.json(data, { status: 200 });
 }
