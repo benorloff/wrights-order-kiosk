@@ -8,7 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, Suspense } from "react";
 import { useSettingsStore } from "@/lib/store";
 import { LocationModal } from "@/components/LocationModal";
 import { Settings2 } from "lucide-react";
@@ -18,23 +18,29 @@ import { Order } from "@/types/spire";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
-export default function Home() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [modalOpen, setModalOpen] = useState(false);
-  const { territory, setTerritory } = useSettingsStore();
-  const lastFetchedAt = useRef<Date>(new Date());
+// Client component to handle URL parameters
+function TerritoryHandler() {
   const searchParams = useSearchParams();
+  const { setTerritory } = useSettingsStore();
 
-  const ordersPerPage = 10;
-
-  // Effect to handle territory code from URL
   useEffect(() => {
     const territoryCode = searchParams.get('territoryCode');
     if (territoryCode) {
       setTerritory(territoryCode);
     }
   }, [searchParams, setTerritory]);
+
+  return null;
+}
+
+export default function Home() {
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [modalOpen, setModalOpen] = useState(false);
+  const { territory } = useSettingsStore();
+  const lastFetchedAt = useRef<Date>(new Date());
+
+  const ordersPerPage = 10;
 
   /**
    * Fetches orders from the API based on the current territory.
@@ -117,6 +123,9 @@ export default function Home() {
 
   return (
     <main className="w-screen h-screen flex flex-col bg-gray-100 p-4 gap-4 relative">
+      <Suspense>
+        <TerritoryHandler />
+      </Suspense>
       <header className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Online Orders for {territory}</h1>
         <Button
