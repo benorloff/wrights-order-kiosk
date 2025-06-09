@@ -29,7 +29,7 @@ export function PasswordProtection({ onAuthenticated }: PasswordProtectionProps)
       <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-6 shadow-lg">
         <div>
           <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">
-            Wright's Order Kiosk
+            Wright&apos;s Order Kiosk
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             Please enter the password to continue
