@@ -13,6 +13,7 @@ import { useSettingsStore } from "@/lib/store";
 import { LocationModal } from "@/components/LocationModal";
 import { Settings2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import { PasswordProtection } from "@/components/PasswordProtection";
 
 import { Order } from "@/types/spire";
 import { cn } from "@/lib/utils";
@@ -39,6 +40,12 @@ export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   const { territory } = useSettingsStore();
   const lastFetchedAt = useRef<Date>(new Date());
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // If not authenticated, show password protection
+  if (!isAuthenticated) {
+    return <PasswordProtection onAuthenticated={() => setIsAuthenticated(true)} />;
+  }
 
   const ordersPerPage = 10;
 
@@ -128,14 +135,16 @@ export default function Home() {
       </Suspense>
       <header className="flex items-center justify-between">
         <h1 className="text-3xl font-bold">Online Orders for {territory}</h1>
-        <Button
-          onClick={() => setModalOpen(true)}
-          title="Settings"
-          variant={"default"}
-          className="cursor-pointer"
-        >
-          <Settings2 className="w-5 h-5" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={() => setModalOpen(true)}
+            title="Settings"
+            variant={"default"}
+            className="cursor-pointer"
+          >
+            <Settings2 className="w-5 h-5" />
+          </Button>
+        </div>
         <LocationModal open={modalOpen} onOpenChange={setModalOpen} />
       </header>
 
