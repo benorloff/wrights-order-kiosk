@@ -112,7 +112,7 @@ export default function Home() {
         <Button
           onClick={() => setModalOpen(true)}
           title="Settings"
-          variant={"secondary"}
+          variant={"default"}
           className="cursor-pointer"
         >
           <Settings2 className="w-5 h-5" />
@@ -121,9 +121,9 @@ export default function Home() {
       </header>
 
       <section className="grow">
-        <Table className="h-full w-full text-2xl rounded-md border shadow table-auto">
+        <Table className="h-full w-full text-2xl bg-white rounded-md border shadow table-auto">
           <TableHeader>
-            <TableRow className="bg-white">
+            <TableRow>
               <TableHead>Order #</TableHead>
               <TableHead>Customer</TableHead>
               <TableHead>Company</TableHead>
@@ -133,39 +133,48 @@ export default function Home() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedOrders[currentPage]?.map((order) => (
-              <TableRow
-                key={order.id}
-                className={cn(
-                  getStatusColor(order.status),
-                  isNewOrder(order.created) ? "animate-pulse" : ""
-                )}
-              >
-                <TableCell>{order.orderNo}</TableCell>
-                <TableCell>{order.customer.name}</TableCell>
-                <TableCell>{order.customer.customerNo}</TableCell>
-                <TableCell>
-                  {new Date(order.created).toLocaleString()}
+            {orders.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8 text-gray-500 text-4xl">
+                  There are currently no online orders awaiting processing.
                 </TableCell>
-                <TableCell>${Number(order.total).toFixed(2)}</TableCell>
-                <TableCell>{orderStatus(order.status)}</TableCell>
               </TableRow>
-            ))}
-            {paginatedOrders[currentPage]?.length < 10
-              ? Array.from({
-                  length: 10 - paginatedOrders[currentPage]?.length,
-                }).map((__, index) => (
-                  <TableRow key={index}>
-                    {/* Placeholder row(s) to maintain equal row heights */}
-                    <TableCell className="text-transparent">-</TableCell>
-                    <TableCell></TableCell>
-                    <TableCell></TableCell>
-                    <TableCell></TableCell>
-                    <TableCell></TableCell>
-                    <TableCell></TableCell>
+            ) : (
+              <>
+                {paginatedOrders[currentPage]?.map((order) => (
+                  <TableRow
+                    key={order.id}
+                    className={cn(
+                      getStatusColor(order.status),
+                      isNewOrder(order.created) ? "animate-pulse" : ""
+                    )}
+                  >
+                    <TableCell>{order.orderNo}</TableCell>
+                    <TableCell>{order.customer.name}</TableCell>
+                    <TableCell>{order.customer.customerNo}</TableCell>
+                    <TableCell>
+                      {new Date(order.created).toLocaleString()}
+                    </TableCell>
+                    <TableCell>${Number(order.total).toFixed(2)}</TableCell>
+                    <TableCell>{orderStatus(order.status)}</TableCell>
                   </TableRow>
-                ))
-              : ""}
+                ))}
+                {paginatedOrders[currentPage]?.length < 10
+                  ? Array.from({
+                      length: 10 - paginatedOrders[currentPage]?.length,
+                    }).map((__, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="text-transparent">-</TableCell>
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                      </TableRow>
+                    ))
+                  : ""}
+              </>
+            )}
           </TableBody>
         </Table>
       </section>
