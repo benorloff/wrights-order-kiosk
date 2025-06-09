@@ -34,25 +34,22 @@ function TerritoryHandler() {
   return null;
 }
 
-export default function Home() {
+function OrderDisplay() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
   const { territory } = useSettingsStore();
   const lastFetchedAt = useRef<Date>(new Date());
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // If not authenticated, show password protection
-  if (!isAuthenticated) {
-    return <PasswordProtection onAuthenticated={() => setIsAuthenticated(true)} />;
-  }
-
   const ordersPerPage = 10;
 
-  /**
-   * Fetches orders from the API based on the current territory.
-   * Updates the `orders` state and resets the `currentPage` to 0.
-   */
+  const paginatedOrders = useMemo(() => {
+    const pages = [];
+    for (let i = 0; i < orders.length; i += ordersPerPage) {
+      pages.push(orders.slice(i, i + ordersPerPage));
+    }
+    return pages;
+  }, [orders]);
+
   const fetchOrders = async () => {
     const territory = useSettingsStore.getState().territory;
     const res = await fetch(`/api/orders?territoryCode=${territory}`);
@@ -62,30 +59,12 @@ export default function Home() {
     setCurrentPage(0);
   };
 
-  /**
-   * Computes the paginated orders based on the `orders` array and `ordersPerPage`.
-   */
-  const paginatedOrders = useMemo(() => {
-    const pages = [];
-    for (let i = 0; i < orders.length; i += ordersPerPage) {
-      pages.push(orders.slice(i, i + ordersPerPage));
-    }
-    return pages;
-  }, [orders]);
-
-  /**
-   * Effect to fetch orders when the component mounts or when the `territory` changes.
-   * Sets up an interval to automatically refresh orders every 5 minutes.
-   */
   useEffect(() => {
     fetchOrders();
     const interval = setInterval(fetchOrders, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [territory]);
 
-  /**
-   * Effect to handle automatic cycling through pages if there are multiple pages of orders.
-   */
   useEffect(() => {
     if (paginatedOrders.length <= 1) return;
     const cycle = setInterval(() => {
@@ -98,10 +77,6 @@ export default function Home() {
     switch (status) {
       case "L":
         return "bg-green-400";
-      // case "P":
-      //   return "bg-green-100";
-      // case "S":
-      //   return "bg-red-100";
       default:
         return "bg-white";
     }
@@ -227,4 +202,14 @@ export default function Home() {
       </footer>
     </main>
   );
+}
+
+export default function Home() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  if (!isAuthenticated) {
+    return <PasswordProtection onAuthenticated={() => setIsAuthenticated(true)} />;
+  }
+
+  return <OrderDisplay />;
 }
