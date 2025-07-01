@@ -34,10 +34,40 @@ function TerritoryHandler() {
   return null;
 }
 
+// Countdown timer component
+function CountdownTimer({ lastFetchedAt }: { lastFetchedAt: Date }) {
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const refreshInterval = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+  useEffect(() => {
+    const updateTimer = () => {
+      const now = new Date().getTime();
+      const nextRefresh = lastFetchedAt.getTime() + refreshInterval;
+      const remaining = Math.max(0, nextRefresh - now);
+      setTimeRemaining(remaining);
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [lastFetchedAt, refreshInterval]);
+
+  const minutes = Math.floor(timeRemaining / 60000);
+  const seconds = Math.floor((timeRemaining % 60000) / 1000);
+
+  return (
+    <span className="text-lg text-gray-500">
+      Next refresh in: {minutes.toString().padStart(1, '0')} minutes {seconds.toString().padStart(2, '0')} seconds
+    </span>
+  );
+}
+
 function OrderDisplay() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [modalOpen, setModalOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { territory } = useSettingsStore();
   const lastFetchedAt = useRef<Date>(new Date());
   const ordersPerPage = 10;
@@ -51,12 +81,27 @@ function OrderDisplay() {
   }, [orders]);
 
   const fetchOrders = async () => {
-    const territory = useSettingsStore.getState().territory;
-    const res = await fetch(`/api/orders?territoryCode=${territory}`);
-    const data = await res.json();
-    setOrders(data.records);
-    lastFetchedAt.current = new Date();
-    setCurrentPage(0);
+    try {
+      setIsLoading(true);
+      setError(null);
+      const territory = useSettingsStore.getState().territory;
+      const res = await fetch(`/api/orders?territoryCode=${territory}`);
+      
+      if (!res.ok) {
+        throw new Error(`Failed to fetch orders: ${res.status} ${res.statusText}`);
+      }
+      
+      const data = await res.json();
+      setOrders(data.records || []);
+      lastFetchedAt.current = new Date();
+      setCurrentPage(0);
+    } catch (err) {
+      console.error('Error fetching orders:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch orders from Spire');
+      setOrders([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -136,7 +181,23 @@ function OrderDisplay() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {orders.length === 0 ? (
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8 text-gray-500 text-4xl">
+                  Loading orders...
+                </TableCell>
+              </TableRow>
+            ) : error ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8 text-red-500 text-4xl">
+                  Error: {error}
+                  <br />
+                  <span className="text-2xl text-gray-600 mt-2 block">
+                    Please check Spire for accurate order information.
+                  </span>
+                </TableCell>
+              </TableRow>
+            ) : orders.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-8 text-gray-500 text-4xl">
                   There are currently no online orders awaiting processing.
@@ -196,9 +257,12 @@ function OrderDisplay() {
             </Button>
           ))}
         </div>
-        <p className="text-lg text-gray-500">
-          Last updated: {lastFetchedAt.current.toLocaleString()}
-        </p>
+        <div className="flex items-center gap-4">
+          <p className="text-lg text-gray-500">
+            Last updated: {lastFetchedAt.current.toLocaleString()}
+          </p>
+          <CountdownTimer lastFetchedAt={lastFetchedAt.current} />
+        </div>
       </footer>
     </main>
   );
